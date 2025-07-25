@@ -42,3 +42,18 @@
     #define OCTANE_STATIC_ASSERT static_assert
 #endif
 
+//function inlining
+#if defined(__clang__) || defined(__gcc__)
+    #define OCTANE_INLINE __attribute__((always_inline)) inline
+    #define OCTANE_NOINLINE __attribute__((noinline))
+    
+#elif defined(_MSC_VER)
+    #define OCTANE_INLINE __forceinline
+    #define OCTANE_NOINLINE __declspec(noinline)
+
+#else
+    #define OCTANE_INLINE inline
+    #define OCTANE_NOINLINE
+
+#endif
+
