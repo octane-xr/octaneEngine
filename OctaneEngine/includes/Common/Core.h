@@ -57,3 +57,60 @@
 
 #endif
 
+//console logging
+#ifdef OCTANE_ENABLE_LOG
+    namespace Octane
+    {
+        struct OCTANE_API Logger
+        {
+            using SPDLog = std::shared_ptr<spdlog::logger>;
+            OCTANE_INLINE Logger()
+            {
+                m_SPD = spdlog::stdout_color_mt("stdout");
+                spdlog::set_level(spdlog::level::trace);
+                spdlog::set_pattern("%^[%T]: [#%t] %v%$");
+            }
+
+            OCTANE_INLINE static SPDLog& Ref()
+            {
+                static Logger logger;
+                return logger.m_SPD;
+            }
+
+        private:
+            SPDLog m_SPD;
+
+        };
+    }
+
+    //logging macros
+    #define OCTANE_TRACE(...) Octane::Logger::Ref()->trace(__VA_ARGS__)
+    #define OCTANE_DEBUG(...) Octane::Logger::Ref()->debug(__VA_ARGS__)
+    #define OCTANE_INFO(...) Octane::Logger::Ref()->info(__VA_ARGS__)
+    #define OCTANE_WARN(...) Octane::Logger::Ref()->warn(__VA_ARGS__)
+    #define OCTANE_ERROR(...) Octane::Logger::Ref()->error(__VA_ARGS__)
+    #define OCTANE_FATAL(...) Octane::Logger::Ref()->critical(__VA_ARGS__)
+
+#else  
+    #define OCTANE_TRACE
+    #define OCTANE_DEBUG
+    #define OCTANE_INFO
+    #define OCTANE_WARN
+    #define OCTANE_ERROR
+    #define OCTANE_FATAL
+
+#endif
+
+//typeid
+namespace Octane
+{
+    template <typename T>
+    OCTANE_INLINE constexpr uint32_t TypeID()
+    {
+        return static_cast<uint32_t>(reinterpret_cast<std::uintptr_t>(&typeid(T)));
+
+    }
+}
+
+//free allocated memory
+#define OCTANE_DELETE(ptr) if (ptr != nullptr) {delete (ptr); ptr=nullptr;}

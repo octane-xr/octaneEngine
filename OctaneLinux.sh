@@ -4,7 +4,7 @@
 target="Targets/$1"
 
 #activate python environment
-source ~/empy/bin/activate
+source ~/octane/bin/activate
 
 #install conan dependencies
 conan install . --install-folder $target --build missing -s build_type=$1 -c tools.system.package_manager:sudo=True -c tools.system.package_manager:mode=install
