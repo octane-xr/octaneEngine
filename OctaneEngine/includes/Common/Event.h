@@ -16,7 +16,8 @@ namespace Octane
     };
 
     //Event registry
-    template <typename Event> struct EventRegistry
+    template <typename Event> 
+    struct EventRegistry
     {
         using Listener = std::unique_ptr<EventListener<Event>>;
         std::queue<std::unique_ptr<Event>> Queue;
@@ -34,13 +35,15 @@ namespace Octane
             }
         }
 
-        template <typename Event, typename Callback> OCTANE_INLINE void AttachCallback(Callback&& callback, uint32_t listnrid)
+        template <typename Event, typename Callback> 
+        OCTANE_INLINE void AttachCallback(Callback&& callback, uint32_t listnrid)
         {
             auto listener = std::make_unique<EventListener<Event>>(std::move(callback), listnrid);
             GetRegistry<Event>()->Listeners.push_back(std::move(listener));
         }
 
-        template <typename Event> OCTANE_INLINE void DetachCallback(uint32_t listnrid)
+        template <typename Event> 
+        OCTANE_INLINE void DetachCallback(uint32_t listnrid)
         {
             auto& listeners = GetRegistry<Event>()->Listeners;
             listeners.erase(std::remove_if(listeners.begin(), listener.end(), [&] (auto& listener)
@@ -65,14 +68,16 @@ namespace Octane
             }
         }
 
-        template <typename Event, typename... Args> OCTANE_INLINE void PostEvent(Args&&...args)
+        template <typename Event, typename... Args> 
+        OCTANE_INLINE void PostEvent(Args&&...args)
         {
             auto registry = GetRegistry<Event>();
             if(registry->listeners.empty()) {return;}
             registry -> Queue.push(std::make_unique<Event> (std::forwards<Args>(args) ...));
         }
 
-        template<typename Task> OCTANE_INLINE void PostTask(Task&& task)
+        template<typename Task> 
+        OCTANE_INLINE void PostTask(Task&& task)
         {
             m_Tasks.push(std::move(task));
         }
@@ -101,12 +106,14 @@ namespace Octane
         }
 
         private:
-            template<typename Event> OCTANE_INLINE EventRegistry<Event>* CastRegistry (void* p)
+            template<typename Event> 
+            OCTANE_INLINE EventRegistry<Event>* CastRegistry (void* p)
             {
                 return static_cast<EventRegistry<Event>*>(p);
             }
             
-            template <typename Event> OCTANE_INLINE EventRegistry<Event>* GetRegistry()
+            template <typename Event> 
+            OCTANE_INLINE EventRegistry<Event>* GetRegistry()
             {
                 auto it = m_Registry.find(TypeID<Event>());
                 if(it !) m_Registry.end()
