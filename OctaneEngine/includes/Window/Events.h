@@ -21,4 +21,55 @@ namespace Octane
     };
 
     //Key Events
+
+    struct KeyReleaseEvent
+    {
+        KeyReleaseEvent(int32_t key): Key(key) {}
+        int32_t Key = -1;
+    };
+
+    struct KeyPressEvent
+    {
+        KeyPressEvent(int32_t key): Key(key) {}
+        int32_t Key = -1;
+    };
+
+    struct KeyRepeatEvent
+    {
+        KeyRepeatEvent(int32_t key): Key(key) {}
+        int32_t Key = -1;
+    };
+
+    //Mouse Events
+
+    struct MouseReleaseEvent
+    {
+        MouseReleaseEvent(int32_t b): Button(b){}
+        int32_t Button = -1;
+    };
+
+    struct MouseDownEvent
+    {
+        MouseDownEvent(int32_t b): Button(b){}
+        int32_t Button = -1;
+    };
+
+    struct MouseDragEvent
+    {
+        MouseDragEvent(double dx, double dy): DeltaX(dx), DeltaY(dy) {}
+        double DeltaX = 0, DeltaY = 0;
+    };
+
+    struct MouseMotionEvent
+    {
+        MouseMotionEvent(double x, double y): TargetX(x), TargetY(y) {}
+        double TargetX = 0, TargetY = 0;
+    };
+
+    struct MouseWheelEvent 
+    {
+        MouseWheelEvent(double sx, double sy): ScrollX(sx), ScrollY(sy) {}
+        double ScrollX = 0, ScrollY=0;
+    };
+
 }
