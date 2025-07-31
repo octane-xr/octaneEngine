@@ -36,7 +36,7 @@ namespace Octane
         }
 
         template <typename Event, typename Callback> 
-        OCTANE_INLINE void AttachCallback(Callback&& callback, uint32_t listnrid)
+        OCTANE_INLINE void AttachCallback(Callback&& callback, uint32_t listnrid)   
         {
             auto listener = std::make_unique<EventListener<Event>>(std::move(callback), listnrid);
             GetRegistry<Event>()->Listeners.push_back(std::move(listener));
@@ -46,7 +46,7 @@ namespace Octane
         OCTANE_INLINE void DetachCallback(uint32_t listnrid)
         {
             auto& listeners = GetRegistry<Event>()->Listeners;
-            listeners.erase(std::remove_if(listeners.begin(), listener.end(), [&] (auto& listener)
+            listeners.erase(std::remove_if(listeners.begin(), listeners.end(), [&] (auto& listener)
             {
                 return (listener->ID==listnrid);
             }),
@@ -73,7 +73,7 @@ namespace Octane
         {
             auto registry = GetRegistry<Event>();
             if(registry->listeners.empty()) {return;}
-            registry -> Queue.push(std::make_unique<Event> (std::forwards<Args>(args) ...));
+            registry -> Queue.push(std::make_unique<Event> (std::forward<Args>(args) ...));
         }
 
         template<typename Task> 
@@ -116,12 +116,12 @@ namespace Octane
             OCTANE_INLINE EventRegistry<Event>* GetRegistry()
             {
                 auto it = m_Registry.find(TypeID<Event>());
-                if(it !) m_Registry.end()
+                if(it != m_Registry.end())
                 {
                     return CastRegistry<Event>(it->second);
                 }
                 auto registry = new EventRegistry<Event>();
-                m_registry[TypeID<Event>()] = registry;
+                m_Registry[TypeID<Event>()] = registry;
                 return registry;
             }
 
