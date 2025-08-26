@@ -1,5 +1,5 @@
 #pragma once
-#include "Common/Core.h"
+#include "Common/Event.h"
 
 namespace Octane
 {
@@ -18,5 +18,7 @@ namespace Octane
         }
 
         std::vector<AppInterface*> Layers;
+        EventDispatcher Dispatcher;
+    
     };
 }

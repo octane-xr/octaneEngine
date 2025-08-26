@@ -16,6 +16,7 @@ namespace Octane
             OCTANE_DELETE(m_Context);
         }
 
+        /*
         OCTANE_INLINE void RunContext()
         {
             while(true)
@@ -26,13 +27,14 @@ namespace Octane
                 }
             }
         }
+        */
 
         template<typename Layer> OCTANE_INLINE Layer* GetLayer()
         {
             OCTANE_STATIC_ASSERT(std::is_base_of<AppInterface,Layer>::value);
             auto itr = std::find_if(m_Context->Layers.begin(),m_Context->Layers.end(),[this] (auto layer)
             {
-                return (layer->m_LayerId==TypeId<Layer>());
+                return (layer->m_LayerId==TypeID<Layer>());
             });
 
             if(itr != m_Context->Layers.end())
@@ -64,5 +66,22 @@ namespace Octane
 
         }
 
+        OCTANE_INLINE void RunContext()
+        {
+            int teta = 0;
+            while(teta<10)
+            {
+                m_Context->Dispatcher.PollEvents(); //handle events
+                for(auto layer : m_Context->Layers) //update layers
+                {
+                    layer->OnUpdate();
+                }
+                teta++;
+            }
+        }
+
+
     };
+
+
 }

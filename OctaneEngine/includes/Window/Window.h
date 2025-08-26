@@ -1,0 +1,170 @@
+#pragma once
+#include "Events.h"
+
+namespace Octane
+{
+    struct AppWindow
+    {
+        OCTANE_INLINE AppWindow(EventDispatcher* dispatcher, int32_t width, int32_t height, const char* title)
+        {
+            //toDo
+        }
+
+        OCTANE_INLINE ~AppWindow()
+        {
+            glfwDestroyWindow(m_Handle);
+            glfwTerminate();
+        }
+
+        OCTANE_INLINE GLFWwindow* Handle()
+        {
+            return m_Handle;
+        }
+
+        OCTANE_INLINE bool PollEvents()
+        {
+            glfwPollEvents();
+            m_Dispatcher->PollEvents();
+            glfwSwapBuffers(m_Handle);
+            return (!glfwWindowShouldClose(m_Handle));
+        }
+
+        OCTANE_INLINE bool IsKey(int32_t key)
+        {
+            if(key >= 0 && key <= GLFW_KEY_LAST)
+                return m_Inputs.Keys.test(key);
+            return false;
+        }
+
+        OCTANE_INLINE bool IsMouse(int32_t button)
+        {
+            if(button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST)
+                return m_Inputs.Mouse.test(button);
+            return false;
+        }
+
+        OCTANE_INLINE static AppWindow* GetUserData(GLFWwindow* window)
+        {
+            return static_cast<AppWindow*> (glfwGetWindowUserPointer(window));
+        }
+
+        OCTANE_INLINE static void OnKey(GLFWwindow* window, int32_t key, int32_t, int32_t action, int32_t)
+        {
+            AppWindow* self = GetUserData(window);
+
+            if(key >= 0 && key <= GLFW_KEY_LAST)
+            {
+                switch(action)
+                {
+                    case GLFW_RELEASE:
+                        self->m_Dispatcher->PostEvent<KeyReleaseEvent> (key);
+                        self->m_Inputs.Keys.reset(key);
+                    break;
+
+                    case GLFW_PRESS:
+                        self->m_Dispatcher->PostEvent<KeyPressEvent> (key);
+                        self->m_Inputs.Keys.set(key);
+                    break;
+
+                    case GLFW_REPEAT:
+                        self->m_Dispatcher->PostEvent<KeyRepeatEvent> (key);
+                        self->m_Inputs.Keys.set(key);
+                    break;
+
+
+                }
+                return;
+            }
+            OCTANE_ERROR("invalid key code detected: [{}]", key);
+        }
+
+        OCTANE_INLINE static void OnMouse(GLFWwindow* window, int32_t button, int32_t action, int32_t)
+        {
+            AppWindow* self = GetUserData(window);
+
+            if(button >= 0 && button <= GLFW_MOUSE_BUTTON_LAST)
+            {
+                switch(action)
+                {
+                    case GLFW_PRESS:
+                        self->m_Dispatcher->PostEvent<MouseDownEvent> (button);
+                        self->m_Inputs.Mouse.set(button);
+                    break;
+
+                    case GLFW_RELEASE:
+                        self->m_Dispatcher->PostEvent<MouseReleaseEvent> (button);
+                        self->m_Inputs.Mouse.reset(button);
+                    break;
+                }
+                return;
+            }
+            OCTANE_WARN("Invalid key code detected: [{}]", button);
+        }
+
+        OCTANE_INLINE static void OnResize(GLFWwindow* window, int32_t width, int32_t height)
+        {
+            GetUserData(window)->m_Dispatcher->PostEvent<WindowResizeEvent>(width, height);
+        }
+
+        OCTANE_INLINE static void OnMotion(GLFWwindow* window, double x, double y)
+        {
+            AppWindow* self = GetUserData(window);
+            self->m_Dispatcher->PostEvent<MouseMotionEvent>(x,y);
+
+            if (self->m_Inputs.Mouse.test(GLFW_MOUSE_BUTTON_LEFT))
+            {
+                self->m_Dispatcher->PostEvent<MouseDragEvent>(
+                    (self->m_Inputs.MouseX - x),
+                    (self->m_Inputs.MouseY - y)
+                );
+            }
+            self->m_Inputs.MouseX = x;
+            self->m_Inputs.MouseY = y;
+        }
+
+        OCTANE_INLINE static void OnWheel (GLFWwindow* window, double x, double y)
+        {
+            GetUserData(window)->m_Dispatcher->PostEvent<MouseWheelEvent>(x,y);
+        }
+
+        OCTANE_INLINE static void OnMaximize(GLFWwindow* window, int32_t action)
+        {
+            if(action)
+            {
+                GetUserData(window)->m_Dispatcher->PostEvent<WindowMaximizeEvent>();
+            }
+            else
+            {
+                GetUserData(window)->m_Dispatcher->PostEvent<WindowRestoreEvent>();
+            }
+        }
+
+        OCTANE_INLINE static void OnIconify(GLFWwindow* window, int32_t action)
+        {
+            if(action)
+            {
+                GetUserData(window)->m_Dispatcher->PostEvent<WindowIconifyEvent>();
+            }
+            else
+            {
+                GetUserData(window)->m_Dispatcher->PostEvent<WindowResizeEvent>();
+            }
+        }
+
+        OCTANE_INLINE static void OnError(int32_t code, const char* msg)
+        {
+            OCTANE_ERROR("[GLFW]: [{}] {}", code, msg);
+        }
+
+        OCTANE_INLINE static void OnClose(GLFWwindow* window)
+        {
+            GetUserData(window)->m_Dispatcher->PostEvent<WindowCloseEvent>();
+        }
+    
+        private:
+            EventDispatcher* m_Dispatcher;
+            WindowInputs m_Inputs;
+            GLFWwindow* m_Handle;
+
+    };
+}
