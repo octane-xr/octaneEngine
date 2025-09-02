@@ -72,7 +72,7 @@ namespace Octane
         OCTANE_INLINE void PostEvent(Args&&...args)
         {
             auto registry = GetRegistry<Event>();
-            if(registry->listeners.empty()) {return;}
+            if(registry->Listeners.empty()) {return;}
             registry -> Queue.push(std::make_unique<Event> (std::forward<Args>(args) ...));
         }
 

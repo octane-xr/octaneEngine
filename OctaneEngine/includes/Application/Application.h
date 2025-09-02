@@ -7,7 +7,7 @@ namespace Octane
     {
         OCTANE_INLINE Application()
         {
-            m_LayerId = TypeID<Application>();
+            m_LayerID = TypeID<Application>();
             m_Context = new AppContext();
         }
 
@@ -34,7 +34,7 @@ namespace Octane
             OCTANE_STATIC_ASSERT(std::is_base_of<AppInterface,Layer>::value);
             auto itr = std::find_if(m_Context->Layers.begin(),m_Context->Layers.end(),[this] (auto layer)
             {
-                return (layer->m_LayerId==TypeID<Layer>());
+                return (layer->m_LayerID==TypeID<Layer>());
             });
 
             if(itr != m_Context->Layers.end())
@@ -59,7 +59,7 @@ namespace Octane
             //create layer and add to collection
             auto layer = new Layer(std::forward<Args>(args)...);
             m_Context->Layers.push_back(layer);
-            layer->m_LayerId = TypeID<Layer>();
+            layer->m_LayerID = TypeID<Layer>();
             layer->m_Context = m_Context;
             layer->OnStart();
             return layer;
@@ -68,20 +68,16 @@ namespace Octane
 
         OCTANE_INLINE void RunContext()
         {
-            int teta = 0;
-            while(teta<10)
+            while(m_Context->Window->PollEvents())
             {
-                m_Context->Dispatcher.PollEvents(); //handle events
-                for(auto layer : m_Context->Layers) //update layers
+                for(auto layer : m_Context->Layers)
                 {
                     layer->OnUpdate();
                 }
-                teta++;
             }
         }
 
 
     };
-
 
 }
