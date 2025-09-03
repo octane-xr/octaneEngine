@@ -1,4 +1,5 @@
 [requires]
+glm/ccu.20230113
 spdlog/1.12.0
 opengl/system
 glfw/3.3.8
