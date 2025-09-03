@@ -10,12 +10,15 @@
 #include <algorithm>
 #include <functional>
 #include <unordered_map>
+#include <GL/glew.h>
 
 //include spdlog
 #define FMT_HEADER_ONLY
 #define SPDLOG_FMT_EXTERNAL
 #include <spdlog/spdlog.h>
 #include <spdlog/sinks/stdout_color_sinks.h>
+#define GLEW_STATIC
+
 
 //import, export
 #ifdef OCTANE_EXPORT

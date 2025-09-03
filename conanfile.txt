@@ -1,9 +1,12 @@
 [requires]
 spdlog/1.12.0
+opengl/system
 glfw/3.3.8
+glew/2.2.0
 
 [generators]
 cmake
 
 [options]
+glew:shared=False
 glfw:shared=False
